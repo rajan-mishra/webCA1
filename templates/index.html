@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for ("static", filename="css/bootstrap.css")}}">
+    <link rel="stylesheet" href="{{ url_for ("static", filename="css/font-awesome.min.css")}}">
+    <link rel="stylesheet" href="{{ url_for ("static", filename="css/owl.carousel.min.css")}}">
+    <link rel="stylesheet" href="{{ url_for ("static", filename="css/owl.theme.default.min.css")}}">
+    <link rel="stylesheet" href="{{ url_for ("static", filename="style.css")}}">
+    <link rel="stylesheet" href="{{ url_for ("static", filename="responsive.css")}}">
+    <link rel="stylesheet" href="{{ url_for ("static", filename="css/main.css")}}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+ integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+ crossorigin=""></script>
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="wrapper">
+        <header class="header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="logo">
+                            <h2><a class="navbar-brand" href="{{ url_for('blog_app.index') }}">
+                                {{ config['BLOG_NAME'] }}
+                              </a></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="menu">
+                            <ul>
+                                {% if session.id %}
+                                <li><span class="navbar-text text-dark">{{ session.full_name }}</span></li>
+                                <li><a href=""{{ url_for('blog_app.index') }}">Home</a></li>
+                                <li><a class="nav-link" href="{{ url_for('blog_app.post')}}">New Post</a></li>
+                                <li><a class="nav-link" href="{{ url_for('author_app.logout')}}">Logout</a></li>
+                                <li><a class="nav-link" href="{{ url_for('author_app.geo_location')}}">Geo-Location</a></li>
+                                {% else %}
+                                <li><a class="nav-link" href="{{ url_for('author_app.login')}}">Login</a></li>
+                                <li><a class="nav-link" href="{{ url_for('author_app.register')}}">SignUp</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <section class="bg-text-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="bg-text">
+                            <h3>{{ config['BLOG_NAME'] }}</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="blog-post-area">
+            <div class="container">
+
+                <div class="row">
+                    {% for post in posts.items %}
+                            <div class="col-md-3">
+                                <div class="single-post">
+                                    {% if post.image %}
+                                        <img src="{{ url_for('static', filename='images/uploads/' + post.image + '.sm.png') }}" class="img-thumbnail" />
+                                    {% endif %}
+                                    <h3><a href="{{ url_for('blog_app.article', slug=post.slug) }}">{{ post.title }}</a></h3>
+                                    <h4><span>Posted by {{ post.author.full_name }}</span>
+                                    </h4>
+                                    <p>{{ post.body[:220] }}</p>
+                                    <h4><span>{{ post.publish_date.strftime('%Y-%m-%d') }}
+                                        {% if post.category %}
+                                        in <a href="{{ url_for('.categories', category_id=post.category.id )}}">
+                                        {{ post.category.name }}
+                                        </a>
+                                        {% endif %}
+                                    </span></h4>
+                                </div>
+                            </div>
+                            {% endfor %}
+                    </div>
+
+                </div>
+
+            <div class="pegination">
+                <!--
+                <ul>
+                    <li><i class="fa fa-angle-left" aria-hidden="true"></i></li>
+                    <li class="active">1</li>
+                    <li>2</li>
+                    <li>3</li>
+                    <li><i class="fa fa-angle-right" aria-hidden="true"></i></li>
+                </ul>
+-->
+
+                <div class="nav-links">
+                    {% if posts.has_prev %}
+                    <a href="{{ url_for('blog_app.index', page=posts.prev_num) }}">&lt;&lt; Newer posts</a>
+                  {% endif %}
+                  {% if posts.has_next %}
+                    <a href="{{ url_for('blog_app.index', page=posts.next_num) }}">Older posts &gt;&gt;</a>
+                  {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <div class="offset-md-2 col-md-8 pt-5 pb-3">
+          <footer>
+            <span class="text-muted">&copy; 2020 {{ config['BLOG_NAME'] }}</span>
+            <span class="text-muted">Developed and Designed By Rajan Rajesh Mishra</span>
+          </footer>
+        </div>
+
+        </div>
+    </div>
+
+
+
+
+    <script src="{{ url_for ("static", filename="js/jquery-3.1.1.min.js")}}"></script>
+    <script src="{{ url_for ("static", filename="js/bootstrap.min.js")}}"></script>
+    <script src="{{ url_for ("static", filename="js/owl.carousel.min.js")}}"></script>
+    <script src="{{ url_for ("static", filename="js/active.js")}}"></script>
+</body>
+
+</html>
